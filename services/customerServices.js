@@ -1,19 +1,38 @@
 const Customer = require('../models/customerModel');
-const { doc, setDoc, getDoc,collection,getDocs } = require('firebase/firestore');
+const { doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit, } = require('firebase/firestore');
 const { db } = require("../database/database");
 
 class customer{
-  createCustomer= async(body) => { 
+  createCustomer = async (body) => {
     try {
       // console.log(body);
+      var t_id;
       const data = {
-        c_id: body.name.slice(0, 4) + body.phone.slice(7),
         name: body.name,
         phone: body.phone,
-        place: body.address,
+        place: body.place,
       }
-      // console.log(data);
-      await setDoc(doc(db, 'Customer', data.c_id), data);
+
+      const _doc = await getDoc(doc(db, 'Customer', "1"));
+      if (!_doc.exists()) {
+        data["c_id"] = 1;
+        t_id = data.c_id.toString();
+        console.log(data);
+        await setDoc(doc(db, 'Customer', t_id), data);
+      }
+
+      else {
+        var q = await query(collection(db, "Customer"), orderBy("c_id", 'desc'), limit(1));
+        var c_docs = await getDocs(q);
+
+        c_docs.forEach((res) => {
+          data["c_id"] = res.data().c_id + 1;
+        })
+
+        t_id = data.c_id.toString();
+        console.log(data);
+        await setDoc(doc(db, 'Customer', t_id), data);
+      }
       return{success:true,message:'Customer Created Successfully',data:data.c_id}
     }
     catch(err){
