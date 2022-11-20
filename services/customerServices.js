@@ -10,7 +10,7 @@ class customer{
       const data = {
         name: body.name,
         phone: body.phone,
-        place: body.place,
+        address: body.place,
       }
 
       const _doc = await getDoc(doc(db, 'Customer', "1"));
@@ -89,7 +89,7 @@ class customer{
     }
   }
 
-  getCustomerByName = async () => {
+  getCustomerNameList = async () => {
     try {
       const docs = await getDocs(collection(db, 'Customer'));
       const names=[]
@@ -101,6 +101,23 @@ class customer{
         });
       })
       return {success: true,message:"Data Fetched Successfully",data:names}
+    }
+    catch (err) {
+      return { success: false, message: err.message };
+    }
+  }
+
+  getCustomerMobileList = async () => {
+    try {
+      const docs = await getDocs(collection(db, 'Customer'));
+      const mobiles = []
+      docs.forEach((doc) => {
+        mobiles.push({
+          mobile: doc.data().phone,
+          id: doc.data().c_id
+        })
+      })
+      return { success: true, message: "Data Fetched Successfully", data: mobiles }
     }
     catch (err) {
       return { success: false, message: err.message };

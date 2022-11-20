@@ -75,11 +75,26 @@ const getAllCustomers = async (req, res, next) => {
   }
 }
 
-const getCustomerByName = async (req, res, next) => {
+const getCustomerNameList = async (req, res, next) => {
   try {
-    const resp = await customerServices.getCustomerByName();
+    const resp = await customerServices.getCustomerNameList();
     if (resp.success == true) {
       res.send({ success: true, message: resp.message,data:resp.data });
+    }
+    else {
+      res.send({ success: false, message: resp.message });
+    }
+
+  } catch (err) {
+    res.send({ success: false, message: err.message });
+  }
+}
+
+const getCustomerMobileList = async (req, res, next) => {
+  try {
+    const resp = await customerServices.getCustomerMobileList();
+    if (resp.success == true) {
+      res.send({ success: true, message: resp.message, data: resp.data });
     }
     else {
       res.send({ success: false, message: resp.message });
@@ -141,7 +156,8 @@ module.exports = {
   deleteCustomer,
   getCustomer,
   getAllCustomers,
-  getCustomerByName,
+  getCustomerNameList,
+  getCustomerMobileList,
   getCustomerByID,
   getCustomerByMobile,
   getCustomerBetweenDates
