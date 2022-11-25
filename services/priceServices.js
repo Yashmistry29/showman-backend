@@ -1,5 +1,6 @@
 const price = require('../models/price');
-const { query, orderBy, limit, collection, getDocs,} = require('firebase/firestore');
+const data = require("../data/PriceOBJ.json");
+const { query, orderBy, limit, collection, getDocs, addDoc, } = require('firebase/firestore');
 const { db} = require('../database/database');
 
 class Price{
@@ -27,6 +28,19 @@ class Price{
     }
     catch (err) {
       console.log(err);
+      return { success: false, message: err.message };
+    }
+  }
+
+  insertDocuments = async () => {
+    try {
+      data.map((doc) => {
+        addDoc(collection(db, "Price"), doc);
+      })
+      return { success: true, message: "DOC written SUCCESSFULLY" };
+    }
+    catch (err) {
+      console.log(err)
       return { success: false, message: err.message };
     }
   }

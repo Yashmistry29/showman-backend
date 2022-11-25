@@ -1,3 +1,4 @@
+const jobServices = require('../services/jobServices');
 const JobServices = require('../services/jobServices');
 
 const createJob = async (req, res, next) => {
@@ -105,6 +106,21 @@ const getJobsBetweenDates = async (req, res, next) => {
   }
 }
 
+const insertDocuments = async (req, res, next) => {
+  try {
+    const resp = await jobServices.insertDocuments();
+    if (resp.success == true) {
+      res.send({ success: true, message: resp.message, });
+    }
+    else {
+      res.send({ success: false, message: resp.message });
+    }
+
+  } catch (err) {
+    res.send({ success: false, message: err.message });
+  }
+}
+
 module.exports = {
   createJob,
   getJob,
@@ -112,5 +128,6 @@ module.exports = {
   deleteJob,
   getAllJobs,
   getAllJobDataByName,
-  getJobsBetweenDates
+  getJobsBetweenDates,
+  insertDocuments
 }

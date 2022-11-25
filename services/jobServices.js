@@ -1,6 +1,8 @@
 const JobData = require('../models/jobData');
+const data = require("../data/convertedJobdata.json");
 const { db} = require('../database/database');
 const { query, orderBy, limit, collection, getDocs, doc, setDoc, getDoc, updateDoc } = require('firebase/firestore');
+const { async } = require('@firebase/util');
 
 class jobData{
   createJob = async (body) => {
@@ -130,6 +132,20 @@ class jobData{
     }
     catch (err) {
       console.log(err);
+      return { success: false, message: err.message };
+    }
+  }
+
+  insertDocuments = async () => {
+    try {
+      data.map(async (doc1) => {
+        await setDoc(doc(db, "JobData", doc1.job_id.toString()), doc1);
+        console.log(doc1.job_id)
+      })
+      return { success: true, message: "DOC written SUCCESSFULLY" };
+    }
+    catch (err) {
+      console.log(err)
       return { success: false, message: err.message };
     }
   }

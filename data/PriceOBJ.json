@@ -1,0 +1,47 @@
+[
+    {
+        "date": "2012-07-20T18:30:00.000Z",
+        "pant_price": 220,
+        "shirt_price": 140
+    },
+    {
+        "date": "2012-10-13T18:30:00.000Z",
+        "pant_price": 230,
+        "shirt_price": 150
+    },
+    {
+        "date": "2013-01-05T18:30:00.000Z",
+        "pant_price": 250,
+        "shirt_price": 150
+    },
+    {
+        "date": "2014-07-02T18:30:00.000Z",
+        "pant_price": 280,
+        "shirt_price": 170
+    },
+    {
+        "date": "2017-09-27T18:30:00.000Z",
+        "pant_price": 350,
+        "shirt_price": 250
+    },
+    {
+        "date": "2018-11-30T18:30:00.000Z",
+        "pant_price": 380,
+        "shirt_price": 270
+    },
+    {
+        "date": "2020-11-13T18:30:00.000Z",
+        "pant_price": 400,
+        "shirt_price": 300
+    },
+    {
+        "date": "2022-05-14T18:30:00.000Z",
+        "pant_price": 450,
+        "shirt_price": 330
+    },
+    {
+        "date": "2022-06-09T18:30:00.000Z",
+        "pant_price": 450,
+        "shirt_price": 350
+    }
+]

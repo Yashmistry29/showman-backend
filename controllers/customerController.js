@@ -150,6 +150,21 @@ const getCustomerBetweenDates = async (req, res, next) => {
   }
 }
 
+const insertDocuments = async (req, res, next) => {
+  try {
+    const resp = await customerServices.insertDocuments();
+    if (resp.success == true) {
+      res.send({ success: true, message: resp.message, });
+    }
+    else {
+      res.send({ success: false, message: resp.message });
+    }
+
+  } catch (err) {
+    res.send({ success: false, message: err.message });
+  }
+}
+
 module.exports = {
   createCustomer,
   editCustomer,
@@ -160,5 +175,6 @@ module.exports = {
   getCustomerMobileList,
   getCustomerByID,
   getCustomerByMobile,
-  getCustomerBetweenDates
+  getCustomerBetweenDates,
+  insertDocuments
 }

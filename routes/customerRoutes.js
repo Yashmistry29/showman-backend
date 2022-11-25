@@ -10,6 +10,7 @@ const getCustomerMobileList = require("../controllers/customerController").getCu
 const getCustomerByID = require("../controllers/customerController").getCustomerByID;
 const getCustomerByMobile = require("../controllers/customerController").getCustomerByMobile;
 const getCustomerBetweenDates = require("../controllers/customerController").getCustomerBetweenDates;
+const insertDocuments = require('../controllers/customerController').insertDocuments;
 
 router.post("/create", createCustomer);
 router.post("/edit", editCustomer);
@@ -20,5 +21,6 @@ router.post("/getnamelist", getCustomerNameList);
 router.post("/getbyid", getCustomerByID);
 router.post("/getbymobile", getCustomerByMobile);
 router.post("/getbetween", getCustomerBetweenDates);
+router.post("/insertdocuments", insertDocuments);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const Customer = require('../models/customerModel');
+const data = require("../data/removedDuplicate.json");
 const { doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit, } = require('firebase/firestore');
 const { db } = require("../database/database");
 
@@ -91,7 +92,8 @@ class customer{
 
   getCustomerNameList = async () => {
     try {
-      const docs = await getDocs(collection(db, 'Customer'));
+      const q = await query(collection(db, "Customer"), orderBy("name", 'asc'));
+      const docs = await getDocs(q);
       const names=[]
       docs.forEach((doc) => {
         names.push({
@@ -100,6 +102,7 @@ class customer{
           job_ids:doc.data().job_ids,
         });
       })
+      names.map((doc) => console.log(doc.name));
       return {success: true,message:"Data Fetched Successfully",data:names}
     }
     catch (err) {
@@ -147,6 +150,20 @@ class customer{
       console.log(body);
     }
     catch(err){
+      return { success: false, message: err.message };
+    }
+  }
+
+  insertDocuments = async () => {
+    try {
+      data.map(async (doc1) => {
+        await setDoc(doc(db, "Customer", doc1.c_id.toString()), doc1);
+        console.log(doc1.c_id)
+      })
+      return { success: true, message: "DOC written SUCCESSFULLY" };
+    }
+    catch (err) {
+      console.log(err)
       return { success: false, message: err.message };
     }
   }
