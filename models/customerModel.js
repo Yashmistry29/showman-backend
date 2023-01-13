@@ -1,13 +1,14 @@
-class Customer{
-  constructor(c_id, name, address, phone, regular, latestJobId, jobIDs) {
-    this.c_id = c_id;
-    this.name = name;
-    this.address = address;
-    this.phone = phone;
-    this.regular = regular;
-    this.latestJobId = latestJobId;
-    this.jobIDs = jobIDs;
-  }
-}
+const mongoose = require('mongoose');
 
-module.exports = Customer;
+const customerSchema = new mongoose.Schema({
+  c_id: Number,
+  name: String,
+  address: String,
+  phone: String,
+  phone2: String,
+  job_ids: [Number],
+  latest_job_id: Number,
+  deleted_job_ids: [Number]
+}, { versionKey: false })
+
+module.exports = mongoose.model('Customer', customerSchema, "Customer");

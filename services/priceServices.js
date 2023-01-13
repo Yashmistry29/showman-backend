@@ -1,13 +1,21 @@
-const price = require('../models/price');
+const mongoose = require('mongoose');
+const PriceCollection = require('../models/price');
 const data = require("../data/PriceOBJ.json");
-const { query, orderBy, limit, collection, getDocs, addDoc, } = require('firebase/firestore');
-const { db} = require('../database/database');
+
+const db = mongoose.connection;
 
 class Price{
   addPrice = async (body) => {
     try {
       console.log(body);
-      return { success: true, message: 'Job created successfully' };
+      var data = {
+        date: new Date().toISOString(),
+        shirt_price: body.shirt_price,
+        pant_price: body.pant_price
+      }
+      var resp = await PriceCollection.create(data);
+      console.log(resp);
+      return { success: true, message: 'Price Changed.' };
     }
     catch (err) {
       console.log(err);
@@ -17,30 +25,15 @@ class Price{
 
   getPrice = async () => {
     try {
-      const q = await query(collection(db, "Price"), orderBy("date","desc"), limit(1));
-      const doc = await getDocs(q);
       const price = {};
-      doc.forEach((data) => {
-        price["shirt_price"] = data.data().shirt_price;
-        price["pant_price"] = data.data().pant_price;
-      })
+
+      var resp = await PriceCollection.findOne().sort({ date: -1 }).limit(1);
+      price["shirt_price"] = resp.shirt_price;
+      price["pant_price"] = resp.pant_price;
       return { success: true, message: 'Price Fetched Successfully',data:price};
     }
     catch (err) {
       console.log(err);
-      return { success: false, message: err.message };
-    }
-  }
-
-  insertDocuments = async () => {
-    try {
-      data.map((doc) => {
-        addDoc(collection(db, "Price"), doc);
-      })
-      return { success: true, message: "DOC written SUCCESSFULLY" };
-    }
-    catch (err) {
-      console.log(err)
       return { success: false, message: err.message };
     }
   }

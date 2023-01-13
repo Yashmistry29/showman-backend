@@ -1,9 +1,9 @@
-class price{
-  constructor(date, shirtPrice, pantPrice) {
-    this.date = new Date();
-    this.shirtPrice = shirtPrice;
-    this.pantPrice = pantPrice;
-  }
-}
+const mongoose = require('mongoose');
 
-module.exports = price;
+const priceSchema = new mongoose.Schema({
+  date: String,
+  pant_price: Number,
+  shirt_price: Number,
+}, { versionKey: false });
+
+module.exports = mongoose.model('Price', priceSchema, 'Price');

@@ -80,7 +80,22 @@ const getAllJobDataByName = async (req, res, next) => {
   try {
     const resp = await JobServices.getAllJobDataByName(req.body);
     if (resp.success == true) {
-      res.send({ success: true, message: resp.message, data: resp.data });
+      res.send({ success: true, message: resp.message, customerData: resp.customerData, data: resp.data });
+    }
+    else {
+      res.send({ success: false, message: resp.message });
+    }
+
+  } catch (err) {
+    res.send({ success: false, message: err.message });
+  }
+}
+
+const getAllJobDataByMobile = async (req, res, next) => {
+  try {
+    const resp = await JobServices.getAllJobDataByMobile(req.body);
+    if (resp.success == true) {
+      res.send({ success: true, message: resp.message, customerData: resp.customerData, data: resp.data });
     }
     else {
       res.send({ success: false, message: resp.message });
@@ -95,7 +110,7 @@ const getJobsBetweenDates = async (req, res, next) => {
   try {
     const resp = await JobServices.getJobsBetweenDates(req.body);
     if (resp.success == true) {
-      res.send({ success: true, message: resp.message, data: resp.data });
+      res.send({ success: true, message: resp.message, customerData: resp.customerData, data: resp.data });
     }
     else {
       res.send({ success: false, message: resp.message });
@@ -106,11 +121,11 @@ const getJobsBetweenDates = async (req, res, next) => {
   }
 }
 
-const insertDocuments = async (req, res, next) => {
+const getJobID = async (req, res, next) => {
   try {
-    const resp = await jobServices.insertDocuments();
+    const resp = await jobServices.getJobID();
     if (resp.success == true) {
-      res.send({ success: true, message: resp.message, });
+      res.send({ success: true, message: resp.message });
     }
     else {
       res.send({ success: false, message: resp.message });
@@ -128,6 +143,7 @@ module.exports = {
   deleteJob,
   getAllJobs,
   getAllJobDataByName,
+  getAllJobDataByMobile,
   getJobsBetweenDates,
-  insertDocuments
+  getJobID,
 }
