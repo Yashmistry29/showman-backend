@@ -6,6 +6,5 @@ const insertDocuments = require('../controllers/priceController').insertDocument
 
 router.post("/editprice", addPriceController);
 router.post("/getprice", getPriceController);
-router.post("/insertdocuments", insertDocuments);
 
 module.exports = router;

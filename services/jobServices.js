@@ -1,7 +1,6 @@
 const { default: mongoose } = require('mongoose');
 const JobData = require('../models/jobData');
 const Customer = require('../models/customerModel');
-const data = require("../data/convertedJobdata.json");
 
 const db = mongoose.connection;
 

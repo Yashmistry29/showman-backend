@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const PriceCollection = require('../models/price');
-const data = require("../data/PriceOBJ.json");
 
 const db = mongoose.connection;
 

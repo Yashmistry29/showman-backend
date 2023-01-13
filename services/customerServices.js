@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Customer = require('../models/customerModel');
-const data = require("../data/removedDuplicate.json");
 
 const db = mongoose.connection;
 

@@ -18,6 +18,5 @@ router.post("/getid", getCustomerID);
 router.post("/getall", getAllCustomers);
 router.post("/getnamelist", getCustomerNameList);
 router.post("/getbyid", getCustomerByID);
-router.post("/insertdocuments", insertDocuments);
 
 module.exports = router;

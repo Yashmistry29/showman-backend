@@ -20,7 +20,6 @@ router.post("/getAllJobDataByName", getAllJobDataByNameController);
 router.post("/getAllJobDataByMobile", getAllJobDataByMobileController);
 router.post("/getJobsBetweenDates", getJobsBetweenDatesController);
 router.post("/getid", getJobID);
-router.post("/insertdocuments", insertDocuments);
 
 
 module.exports = router;
