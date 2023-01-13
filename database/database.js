@@ -1,14 +1,17 @@
-const { initializeApp } = require('firebase/app')
-const { getFirestore } = require('firebase/firestore')
-const { getAuth } = require('firebase/auth')
+const mongoose = require("mongoose");
 const config = require('../config');
 
-console.log('Connecting to Firebase...');
-const app = initializeApp(config.firebaseConfig);
-const db = getFirestore(app);
-console.log('Connected to FireStore');
-const auth = getAuth(app);
-console.log('Connected to Firebase Auth');
-console.log('Connected to Firebase');
+var db = mongoose.connection;
 
-module.exports = { db, auth };
+mongoose.connect(config.server, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+console.log("Connecting to TEST DATABASE....");
+
+db.on("error", console.error.bind(console, "DB connection error:"));
+
+db.once("open", function () {
+  console.log("DB TEST connection successful");
+});
