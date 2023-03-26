@@ -25,7 +25,21 @@ class customer{
 
   editCustomer = async (body) => {
     try {
-      console.log(body);
+      const data = {
+        c_id: body.c_id,
+        name: body.name.toUpperCase(),
+        phone: body.phone,
+        phone2: body.phone2 === null || body.phone2 === undefined ? "" : body.phone2,
+        address: body.address.toUpperCase(),
+      }
+
+      var resp = await Customer.updateOne({ c_id: body.c_id }, {
+        $set: data
+      })
+      console.log(resp)
+      return {
+        success: true, message: 'Customer Data Updated'
+      }
     }
     catch(err){
       return { success: false, message: err.message };
