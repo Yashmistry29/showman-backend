@@ -1,13 +1,15 @@
 const router = require("express").Router();
 
-const LoginController = require("../controllers/userController").login;
-const SignupController = require("../controllers/userController").signup;
-const ForgetPasswordController = require("../controllers/userController").forgetPassword;
-const SignoutController = require("../controllers/userController").signout;
+const {
+  login,
+  signup,
+  forgetPassword,
+  signout
+} = require("../controllers/userController");
 
-router.post("/login", LoginController);
-router.post("/signup", SignupController);
-router.post("/signout", SignoutController);
-router.post("/forgetpassword", ForgetPasswordController);
+router.post("/login", login);
+router.post("/signup", signup);
+router.post("/signout", signout);
+router.post("/forgetpassword", forgetPassword);
 
 module.exports = router;

@@ -1,10 +1,8 @@
 const router = require("express").Router();
 
-const addPriceController = require('../controllers/priceController').addPrice;
-const getPriceController = require('../controllers/priceController').getPrice;
-const insertDocuments = require('../controllers/priceController').insertDocuments;
+const { addPrice, getPrice } = require('../controllers/priceController');
 
-router.post("/editprice", addPriceController);
-router.post("/getprice", getPriceController);
+router.post("/editprice", addPrice);
+router.post("/getprice", getPrice);
 
 module.exports = router;

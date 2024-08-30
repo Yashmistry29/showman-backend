@@ -1,24 +1,26 @@
 const router = require("express").Router();
 
-const createJobController = require("../controllers/jobController").createJob;
-const getJobController = require("../controllers/jobController").getJob;
-const updateJobController = require("../controllers/jobController").updateJob;
-const deleteJobController = require("../controllers/jobController").deleteJob;
-const getAllJobsController = require("../controllers/jobController").getAllJobs;
-const getAllJobDataByNameController = require("../controllers/jobController").getAllJobDataByName;
-const getAllJobDataByMobileController = require("../controllers/jobController").getAllJobDataByMobile;
-const getJobsBetweenDatesController = require("../controllers/jobController").getJobsBetweenDates;
-const getJobID = require("../controllers/jobController").getJobID;
-const insertDocuments = require('../controllers/jobController').insertDocuments;
+const {
+  createJob,
+  getJob,
+  updateJob,
+  deleteJob,
+  getAllJobs,
+  getAllJobDataByName,
+  getAllJobDataByMobile,
+  getJobsBetweenDates,
+  getJobID,
+  getCurrentJobPrice } = require("../controllers/jobController");
 
-router.post("/createJob", createJobController);
-router.post("/getJob", getJobController);
-router.post("/updateJob", updateJobController);
-router.post("/deleteJob", deleteJobController);
-router.post("/getAllJobs", getAllJobsController);
-router.post("/getAllJobDataByName", getAllJobDataByNameController);
-router.post("/getAllJobDataByMobile", getAllJobDataByMobileController);
-router.post("/getJobsBetweenDates", getJobsBetweenDatesController);
+router.post("/createJob", createJob);
+router.post("/getJob", getJob);
+router.post("/updateJob", updateJob);
+router.post("/deleteJob", deleteJob);
+router.post("/getAllJobs", getAllJobs);
+router.post("/getAllJobDataByName", getAllJobDataByName);
+router.post("/getAllJobDataByMobile", getAllJobDataByMobile);
+router.post("/getJobsBetweenDates", getJobsBetweenDates);
+router.post("/getCurrentJobPrice", getCurrentJobPrice);
 router.post("/getid", getJobID);
 
 

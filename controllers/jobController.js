@@ -136,6 +136,21 @@ const getJobID = async (req, res, next) => {
   }
 }
 
+const getCurrentJobPrice = async (req, res, next) => {
+  try {
+    const resp = await jobServices.getCurrentJobPrice(req.body);
+    if (resp.success == true) {
+      res.send({ success: true, message: resp.message });
+    }
+    else {
+      res.send({ success: false, message: resp.message });
+    }
+
+  } catch (err) {
+    res.send({ success: false, message: err.message });
+  }
+}
+
 module.exports = {
   createJob,
   getJob,
@@ -146,4 +161,5 @@ module.exports = {
   getAllJobDataByMobile,
   getJobsBetweenDates,
   getJobID,
+  getCurrentJobPrice
 }

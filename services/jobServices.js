@@ -200,6 +200,24 @@ class jobData{
       return { success: false, message: err.message };
     }
   }
+
+  getCurrentJobPrice = async (body) => {
+    try {
+      var resp = await JobData.findOne({ job_id: body.job_id });
+      var data = {
+        totalPrice: resp.totalPrice,
+        shirt_price: resp.shirt_data.price,
+        pant_price: resp.pant_data.price
+      }
+      return {
+        success: true,
+        message: data
+      }
+    }
+    catch (err) {
+      return { success: false, message: err.message };
+    }
+  }
 }
 
 module.exports = exports = new jobData();
