@@ -10,7 +10,7 @@ class jobData{
       const c_id = body.c_id;
       var jobData = body.jobData;
 
-      resp = await JobData.create(jobData);
+      var resp = await JobData.create(jobData);
       console.log(resp.job_id);
 
       const update_Customer = await Customer.updateOne({ c_id: c_id }, {
@@ -166,7 +166,7 @@ class jobData{
       const endDate = new Date(body.endDate).toISOString();
       var customerData = [];
 
-      var data = await JobData.find({ $and: [{ returnDate: { $gt: startDate } }, { returnDate: { $lt: endDate } }] })
+      var data = await JobData.find({ $and: [{ returnDate: { $gt: startDate } }, { returnDate: { $lt: endDate } }] }).sort({ job_id: 1 })
 
       if (data.length == 0) {
         return { success: false, message: 'No Records Found' };
