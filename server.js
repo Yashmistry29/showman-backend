@@ -16,6 +16,7 @@ const userRoutes = require("./routes/userRoutes");
 const customerRoutes = require("./routes/customerRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const priceRoutes = require("./routes/priceRoute");
+const EmpRoutes = require("./routes/employeeRoutes");
 
 const res = require("express/lib/response");
 
@@ -31,6 +32,7 @@ app.use("/user", userRoutes);
 app.use("/customer", customerRoutes);
 app.use("/job", jobRoutes);
 app.use("/price", priceRoutes);
+app.use("/employee", EmpRoutes);
 
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);

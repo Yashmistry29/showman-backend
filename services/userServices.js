@@ -5,8 +5,7 @@ const user = require('../models/userModel');
 const db = mongoose.connection;
 
 
-class User { 
-  Login = async (body) => {
+exports.Login = async (body) => {
     try {
       var query = { username: body.username };
       console.log(body)
@@ -31,7 +30,7 @@ class User {
   }
 
 
-  Signup = async (body) => {
+exports.Signup = async (body) => {
     try {
       if (body.password !== body.confirmPassword) {
         return { success: false, message: 'Passwords do not match' };
@@ -53,7 +52,7 @@ class User {
   }
 
 
-  ForgetPassword = async (body) => {
+exports.ForgetPassword = async (body) => {
     try {
       return { success: true, message: 'Forget Password Successful' };
     } catch(err) {
@@ -61,14 +60,11 @@ class User {
     }
   }
 
-  Signout = async () => { 
+exports.Signout = async () => { 
     try {
       await signOut(auth);
       return { success: true, message: 'Signout Successful' };
     } catch(err) {
       return { success: false, message: err.message };
     }
-  }
 }
-
-module.exports = exports = new User();

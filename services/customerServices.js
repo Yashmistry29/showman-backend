@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
 const Customer = require('../models/customerModel');
 
-const db = mongoose.connection;
-
-class customer{
-  createCustomer = async (body) => {
+exports.createCustomer = async (body) => {
     try {
       const data = {
         c_id: body.c_id,
@@ -23,7 +20,7 @@ class customer{
     }
   }
 
-  editCustomer = async (body) => {
+exports.editCustomer = async (body) => {
     try {
       const data = {
         c_id: body.c_id,
@@ -46,7 +43,7 @@ class customer{
     }
   }
 
-  deleteCustomer = async (body) => {
+exports.deleteCustomer = async (body) => {
     try {
       console.log(body);
     }
@@ -55,7 +52,7 @@ class customer{
     }
   }
 
-  getCustomer = async (body) => {
+exports.getCustomer = async (body) => {
     try {
       var query = { c_id: body.c_id }
       var resp = await Customer.findOne(query);
@@ -78,7 +75,7 @@ class customer{
     }
   }
 
-  getAllCustomers = async (body) => {
+exports.getAllCustomers = async (body) => {
     try {
       console.log(body);
     }
@@ -87,27 +84,19 @@ class customer{
     }
   }
 
-  getCustomerNameList = async () => {
+exports.getCustomerNameList = async () => {
     try {
-      var resp = await Customer.find().sort({ name: 1 });
-      const names = []
+      var resp = await Customer.find({}, { name: 1, c_id: 1, _id: 0, job_ids: { $reverseArray: "$job_ids" } }).sort({ name: 1 });
 
-      resp.forEach((doc) => {
-        names.push({
-          name: doc.name,
-          id: doc.c_id,
-          job_ids: doc.job_ids,
-        });
-      })
       // names.map((doc) => console.log(doc.name));
-      return {success: true,message:"Data Fetched Successfully",data:names}
+      return { success: true, message: "Data Fetched Successfully", data: resp }
     }
     catch (err) {
       return { success: false, message: err.message };
     }
   }
 
-  getCustomerByID = async (body) => {
+exports.getCustomerByID = async (body) => {
     try {
       console.log(body);
     }
@@ -116,19 +105,15 @@ class customer{
     }
   }
 
-  getCustomerID = async (body) => {
+exports.getCustomerID = async (body) => {
     try {
-      var resp = await Customer.findOne().sort({ c_id: -1 }).limit(1);
-      const c_id = resp.c_id + 1;
+      var resp = await Customer.findOne({}, { c_id: 1, _id: 0 }).sort({ c_id: -1 });
       return {
         success: true,
-        message: c_id
+        message: (resp.c_id || 0) + 1
       }
     }
     catch (err) {
       return { success: false, message: err.message };
     }
-  }
 }
-
-module.exports= exports = new customer();

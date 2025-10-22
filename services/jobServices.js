@@ -2,10 +2,7 @@ const { default: mongoose } = require('mongoose');
 const JobData = require('../models/jobData');
 const Customer = require('../models/customerModel');
 
-const db = mongoose.connection;
-
-class jobData{
-  createJob = async (body) => {
+exports.createJob = async (body) => {
     try {
       const c_id = body.c_id;
       var jobData = body.jobData;
@@ -28,7 +25,7 @@ class jobData{
     }
   }
 
-  getJob = async (body) => {
+exports.getJob = async (body) => {
     try {
       console.log(body);
       var data = await JobData.findOne({ job_id: body.job_id });
@@ -45,7 +42,7 @@ class jobData{
     }
   }
 
-  updateJob = async (body) => {
+exports.updateJob = async (body) => {
     try {
       const c_id = body.c_id;
       var jobData = body.jobData;
@@ -53,18 +50,16 @@ class jobData{
       var resp = await JobData.create(jobData);
       console.log(resp.job_id);
 
-      const customer = await Customer.findOne({ c_id: c_id });
-      var j_ids = customer.job_ids;
-      j_ids.push(resp.job_id);
-
-
-      const update_Customer = await Customer.updateOne({ c_id: c_id }, {
+      const customer = await Customer.updateOne({ c_id: c_id }, {
+        $push: {
+          job_ids: resp.job_id
+        },
         $set: {
-          latest_job_id: resp.job_id,
-          job_ids: j_ids
+          latest_job_id: resp.job_id
         }
       })
-      console.log(update_Customer);
+      console.log(customer);
+      // console.log(update_Customer);
       return { success: true, message: 'Job Created and Update successfully' };
     }
     catch (err) {
@@ -73,21 +68,17 @@ class jobData{
     }
   }
   
-  deleteJob = async (body) => {
+exports.deleteJob = async (body) => {
     try {
       const { job_id, c_id } = body;
-      var resp = await Customer.findOne({ c_id: c_id });
-      var j_ids = resp.job_ids;
-      var deleted_ids = resp.deleted_job_ids;
-      j_ids.splice(j_ids.indexOf(job_id), 1);
-      deleted_ids.push(job_id);
-
-      resp = await Customer.updateOne({ c_id: c_id }, {
-        $set: {
-          job_ids: j_ids,
-          deleted_job_ids: deleted_ids
+      console.log(job_id, c_id);
+      var resp = await Customer.updateOne({ c_id: c_id }, {
+        $pull: {
+          job_ids: job_id
+        }, $push: {
+          deleted_job_ids: job_id
         }
-      })
+      });
       console.log(resp)
 
       return { success: true, message: 'Job Deleted Successfully' };
@@ -98,7 +89,7 @@ class jobData{
     }
   }
 
-  getAllJobs = async (body) => {
+exports.getAllJobs = async (body) => {
     try {
       console.log(body);
       const data="";
@@ -110,9 +101,9 @@ class jobData{
     }
   }
 
-  getAllJobDataByName = async (body) => {
+exports.getAllJobDataByName = async (body) => {
     try {
-      console.log(body);
+      // console.log(body);
       if (body.name != '-') {
         let data = [];
         var customerData = await Customer.find({ c_id: body.name });
@@ -133,7 +124,7 @@ class jobData{
     }
   }
 
-  getAllJobDataByMobile = async (body) => {
+exports.getAllJobDataByMobile = async (body) => {
     try {
       console.log(body);
       if (body.mobile != '' || body.mobile != undefined) {
@@ -160,7 +151,7 @@ class jobData{
     }
   }
 
-  getJobsBetweenDates = async (body) => {
+exports.getJobsBetweenDates = async (body) => {
     try {
       const startDate = new Date(body.startDate).toISOString();
       const endDate = new Date(body.endDate).toISOString();
@@ -187,7 +178,7 @@ class jobData{
     }
   }
 
-  getJobID = async () => {
+exports.getJobID = async () => {
     try {
       var resp = await JobData.findOne().sort({ job_id: -1 }).limit(1);
       const job_id = resp.job_id + 1;
@@ -201,7 +192,7 @@ class jobData{
     }
   }
 
-  getCurrentJobPrice = async (body) => {
+exports.getCurrentJobPrice = async (body) => {
     try {
       var resp = await JobData.findOne({ job_id: body.job_id });
       var data = {
@@ -217,7 +208,4 @@ class jobData{
     catch (err) {
       return { success: false, message: err.message };
     }
-  }
 }
-
-module.exports = exports = new jobData();

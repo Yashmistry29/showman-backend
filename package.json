@@ -1,7 +1,7 @@
 {
   "name": "showman-backend",
   "version": "1.0.0",
-  "description": "Showman Backend with firebase..",
+  "description": "Showman Backend with MongoDB..",
   "main": "server.js",
   "scripts": {
     "test": "nodemon server.js",
@@ -13,7 +13,6 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
-    "firebase": "^9.8.3",
     "jszip": "^3.10.1",
     "md5": "^2.3.0",
     "mongoose": "^6.7.3"
