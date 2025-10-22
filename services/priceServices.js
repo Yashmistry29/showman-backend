@@ -3,8 +3,7 @@ const PriceCollection = require('../models/price');
 
 const db = mongoose.connection;
 
-class Price{
-  addPrice = async (body) => {
+exports.addPrice = async (body) => {
     try {
       console.log(body);
       var data = {
@@ -22,7 +21,7 @@ class Price{
     }
   }
 
-  getPrice = async () => {
+exports.getPrice = async () => {
     try {
       const price = {};
 
@@ -35,7 +34,4 @@ class Price{
       console.log(err);
       return { success: false, message: err.message };
     }
-  }
 }
-
-module.exports=exports=new Price()
