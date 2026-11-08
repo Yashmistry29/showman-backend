@@ -9,6 +9,29 @@ const JSZip = require('jszip');
 const router = require("express").Router();
 const db = mongoose.connection;
 
+const removeDuplicateRecords = (records, field) => {
+  const seen = new Set();
+  const duplicates = [];
+  const uniqueRecords = records.filter((record) => {
+    const value = record[field];
+    if (value === undefined || value === null || value === '') {
+      return true;
+    }
+
+    const numericValue = Number(value);
+    const duplicateKey = Number.isFinite(numericValue) ? numericValue : value;
+    if (seen.has(duplicateKey)) {
+      duplicates.push(value);
+      return false;
+    }
+
+    seen.add(duplicateKey);
+    return true;
+  });
+
+  return { uniqueRecords, duplicates };
+};
+
 router.get("/", async (req, res, next) => {
   var message = {
     success: true,
@@ -49,6 +72,16 @@ router.post("/db/restore", async (req, res, next) => {
     customerCollection,
     adminCollection
   } = JSON.parse(jsonString);
+
+  const jobDataResult = removeDuplicateRecords(jobDataCollection, 'job_id');
+  const customerResult = removeDuplicateRecords(customerCollection, 'c_id');
+  jobDataCollection = jobDataResult.uniqueRecords;
+  customerCollection = customerResult.uniqueRecords;
+
+  console.log("Duplicate records removed during restore:", {
+    jobData: jobDataResult.duplicates,
+    customers: customerResult.duplicates
+  });
 
   await Price.deleteMany({})
   await jobData.deleteMany({})

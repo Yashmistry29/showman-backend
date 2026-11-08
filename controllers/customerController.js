@@ -1,8 +1,14 @@
 const customerServices = require('../services/customerServices');
 
+const getRequestData = (req) => ({
+  ...req.body,
+  ...req.query,
+  ...req.params
+});
+
 const createCustomer = async (req, res, next) => {
   try {
-    const resp = await customerServices.createCustomer(req.body);
+    const resp = await customerServices.createCustomer(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message, data:resp.data });
     }
@@ -17,7 +23,8 @@ const createCustomer = async (req, res, next) => {
 
 const editCustomer = async (req, res, next) => {
   try {
-    const resp = await customerServices.editCustomer(req.body);
+    const requestData = getRequestData(req);
+    const resp = await customerServices.editCustomer(requestData.id, requestData);
     if (resp.success == true) {
       res.send({ success: true, message: resp.message });
     }
@@ -32,7 +39,8 @@ const editCustomer = async (req, res, next) => {
 
 const deleteCustomer = async (req, res, next) => {
   try {
-    const resp = await customerServices.deleteCustomer(req.body);
+    const requestData = getRequestData(req);
+    const resp = await customerServices.deleteCustomer(requestData.id);
     if (resp.success == true) {
       res.send({ success: true, message: resp.message });
     }
@@ -47,7 +55,8 @@ const deleteCustomer = async (req, res, next) => {
 
 const getCustomer = async (req, res, next) => {
   try {
-    const resp = await customerServices.getCustomer(req.body);
+    const requestData = getRequestData(req);
+    const resp = await customerServices.getCustomer(requestData.id);
     if (resp.success == true) {
       res.send({ success: true, message: resp.message, data: resp.data});
     }
@@ -62,9 +71,9 @@ const getCustomer = async (req, res, next) => {
 
 const getAllCustomers = async (req, res, next) => {
   try {
-    const resp = await customerServices.getAllCustomers(req.body);
+    const resp = await customerServices.getAllCustomers(getRequestData(req));
     if (resp.success == true) {
-      res.send({ success: true, message: resp.message });
+      res.send({ success: true, message: resp.message, data: resp.data });
     }
     else {
       res.send({ success: false, message: resp.message });
@@ -77,7 +86,7 @@ const getAllCustomers = async (req, res, next) => {
 
 const getCustomerNameList = async (req, res, next) => {
   try {
-    const resp = await customerServices.getCustomerNameList();
+    const resp = await customerServices.getCustomerNameList(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message,data:resp.data });
     }
@@ -92,9 +101,10 @@ const getCustomerNameList = async (req, res, next) => {
 
 const getCustomerByID = async (req, res, next) => {
   try {
-    const resp = await customerServices.getCustomerByID(req.body);
+    const requestData = getRequestData(req);
+    const resp = await customerServices.getCustomerByID(requestData.id);
     if (resp.success == true) {
-      res.send({ success: true, message: resp.message });
+      res.send({ success: true, message: resp.message, data: resp.data });
     }
     else {
       res.send({ success: false, message: resp.message });
@@ -107,7 +117,7 @@ const getCustomerByID = async (req, res, next) => {
 
 const getCustomerID = async (req, res, next) => {
   try {
-    const resp = await customerServices.getCustomerID(req.body);
+    const resp = await customerServices.getCustomerID(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message });
     }

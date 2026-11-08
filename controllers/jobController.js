@@ -1,11 +1,16 @@
 const jobServices = require('../services/jobServices');
-const JobServices = require('../services/jobServices');
+
+const getRequestData = (req) => ({
+  ...req.body,
+  ...req.query,
+  ...req.params
+});
 
 const createJob = async (req, res, next) => {
   try {
-    const resp = await JobServices.createJob(req.body);
+    const resp = await jobServices.createJob(getRequestData(req));
     if (resp.success == true) {
-      res.send({ success: true, message: resp.message });
+      res.send({ success: true, message: resp.message, data: resp.data });
     }
     else {
       res.send({ success: false, message: resp.message });
@@ -18,7 +23,7 @@ const createJob = async (req, res, next) => {
 
 const getJob = async (req, res, next) => {
   try {
-    const resp = await JobServices.getJob(req.body);
+    const resp = await jobServices.getJob(getRequestData(req).id);
     if (resp.success == true) {
       res.send({ success: true, message: resp.message, data: resp.data });
     }
@@ -33,9 +38,10 @@ const getJob = async (req, res, next) => {
 
 const updateJob = async (req, res, next) => {
   try {
-    const resp = await JobServices.updateJob(req.body);
+    const requestData = getRequestData(req);
+    const resp = await jobServices.updateJob(requestData.c_id, requestData);
     if (resp.success == true) {
-      res.send({ success: true, message: resp.message });
+      res.send({ success: true, message: resp.message, data: resp.data });
     }
     else {
       res.send({ success: false, message: resp.message });
@@ -48,7 +54,8 @@ const updateJob = async (req, res, next) => {
 
 const deleteJob = async (req, res, next) => {
   try {
-    const resp = await JobServices.deleteJob(req.body);
+    const requestData = getRequestData(req);
+    const resp = await jobServices.deleteJob(requestData.c_id, requestData.job_id);
     if (resp.success == true) {
       res.send({ success: true, message: resp.message });
     }
@@ -63,7 +70,7 @@ const deleteJob = async (req, res, next) => {
 
 const getAllJobs = async (req, res, next) => {
   try {
-    const resp = await JobServices.getAllJobs(req.body);
+    const resp = await jobServices.getAllJobs(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message, data: resp.data });
     }
@@ -78,7 +85,7 @@ const getAllJobs = async (req, res, next) => {
 
 const getAllJobDataByName = async (req, res, next) => {
   try {
-    const resp = await JobServices.getAllJobDataByName(req.body);
+    const resp = await jobServices.getAllJobDataByName(getRequestData(req).c_id);
     if (resp.success == true) {
       res.send({ success: true, message: resp.message, customerData: resp.customerData, data: resp.data });
     }
@@ -93,7 +100,7 @@ const getAllJobDataByName = async (req, res, next) => {
 
 const getAllJobDataByMobile = async (req, res, next) => {
   try {
-    const resp = await JobServices.getAllJobDataByMobile(req.body);
+    const resp = await jobServices.getAllJobDataByMobile(getRequestData(req).mobile);
     if (resp.success == true) {
       res.send({ success: true, message: resp.message, customerData: resp.customerData, data: resp.data });
     }
@@ -108,7 +115,7 @@ const getAllJobDataByMobile = async (req, res, next) => {
 
 const getJobsBetweenDates = async (req, res, next) => {
   try {
-    const resp = await JobServices.getJobsBetweenDates(req.body);
+    const resp = await jobServices.getJobsBetweenDates(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message, customerData: resp.customerData, data: resp.data });
     }
@@ -123,7 +130,7 @@ const getJobsBetweenDates = async (req, res, next) => {
 
 const getJobID = async (req, res, next) => {
   try {
-    const resp = await jobServices.getJobID();
+    const resp = await jobServices.getJobID(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message });
     }
@@ -138,7 +145,7 @@ const getJobID = async (req, res, next) => {
 
 const getCurrentJobPrice = async (req, res, next) => {
   try {
-    const resp = await jobServices.getCurrentJobPrice(req.body);
+    const resp = await jobServices.getCurrentJobPrice(getRequestData(req).id);
     if (resp.success == true) {
       res.send({ success: true, message: resp.message });
     }
