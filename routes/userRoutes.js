@@ -7,9 +7,24 @@ const {
   signout
 } = require("../controllers/userController");
 
-router.post("/login", login);
-router.post("/signup", signup);
-router.post("/signout", signout);
-router.post("/forgetpassword", forgetPassword);
+// Legacy route: POST /user/login
+// router.post("/login", login);
+// Suggested new route: POST /user/sessions
+router.post("/sessions", login);
+
+// Legacy route: POST /user/signup
+// router.post("/signup", signup);
+// Suggested new route: POST /user/accounts
+router.post("/accounts", signup);
+
+// Legacy route: POST /user/signout
+// router.post("/signout", signout);
+// Suggested new route: DELETE /user/sessions
+router.delete("/sessions", signout);
+
+// Legacy route: POST /user/forgetpassword
+// router.post("/forgetpassword", forgetPassword);
+// Suggested new route: POST /user/password-resets
+router.post("/password-resets", forgetPassword);
 
 module.exports = router;

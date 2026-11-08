@@ -1,36 +1,53 @@
-const mongoose = require('mongoose');
 const Employee = require('../models/employee');
+const idCounterService = require('./idCounterService');
 
 exports.createEmployee = async (body) => {
   try {
     const data = { ...body };
-    
-    var resp = await Employee.findOne({ e_id: data.e_id });
+    delete data.e_id;
+    data.e_id = await idCounterService.getNextId('employee', true);
 
-    if (resp) {
-      return { success: false, message: "Employee with this ID already exists" };
-    } else {
-      var create_employee = await Employee.create(data);
-      console.log(create_employee);
-      return { success: true, message: "Employee created successfully", data: create_employee.e_id };
+    const result = await Employee.findOneAndUpdate(
+      { e_id: data.e_id },
+      { $setOnInsert: data },
+      { upsert: true, new: true, rawResult: true, setDefaultsOnInsert: true }
+    );
+    const employee = result.value;
+    if (!employee) {
+      throw new Error('Employee upsert returned no document');
     }
+
+    return {
+      success: true,
+      message: result.lastErrorObject.updatedExisting
+        ? "Employee already exists"
+        : "Employee created successfully",
+      data: employee.e_id
+    };
   }
   catch (err) {
+    if (err.code === 11000) {
+      return { success: false, message: "Employee ID already exists" };
+    }
     return { success: false, message: err.message };
   }
 }
 
-exports.updateEmployee = async (body) => {
+exports.updateEmployee = async (id, body) => {
   try {
-    const data = { ...body };
-    var resp = await Employee.updateOne({ e_id: data.e_id }, {
-      $set:data
-    })
+    const e_id = Number(id);
+    if (!Number.isSafeInteger(e_id) || e_id < 0) {
+      return { success: false, message: "Invalid employee ID" };
+    }
 
-    if (resp.modifiedCount > 0) {
+    const data = { ...body };
+    delete data.e_id;
+    const resp = await Employee.updateOne({ e_id }, { $set: data });
+
+    if (resp.matchedCount > 0) {
       return { success: true, message: "Employee data updated successfully" };
     } else {
-      return { success: false, message: "No changes made to employee data" };
+      return { success: false, message: "Employee not found" };
     }
   }
   catch (err) {
@@ -38,10 +55,13 @@ exports.updateEmployee = async (body) => {
   }
 }
 
-exports.getEmployee = async (body) => {
+exports.getEmployee = async (id) => {
   try {
-    console.log(body);
-    var resp = await Employee.findOne({ e_id: body.e_id });
+    const e_id = Number(id);
+    if (!Number.isSafeInteger(e_id) || e_id < 0) {
+      return { success: false, message: "Invalid employee ID" };
+    }
+    const resp = await Employee.findOne({ e_id });
 
     if (resp) {
       return { success: true, message: "Employee data fetched successfully", data: resp };
@@ -69,11 +89,9 @@ exports.getEmployeeNameList = async () => {
   }
 }
 
-exports.getEmployeeId = async (body) => { 
+exports.getEmployeeId = async () => {
   try {
-    var resp = await Employee.findOne({}, { e_id: 1, _id: 0 }).sort({ e_id: -1 });
-    console.log(resp);
-    const e_id = resp ? resp.e_id + 1 : 1; // If no employee exists, start from 1
+    const e_id = await idCounterService.getNextId('employee');
     return { success: true, message: "Employee ID fetched successfully", data: e_id };
   }
   catch (err) {

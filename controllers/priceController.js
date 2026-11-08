@@ -1,8 +1,14 @@
 const PriceServices = require('../services/priceServices');
 
+const getRequestData = (req) => ({
+  ...req.body,
+  ...req.query,
+  ...req.params
+});
+
 const addPrice = async (req, res, next) => {
   try {
-    const resp = await PriceServices.addPrice(req.body);
+    const resp = await PriceServices.addPrice(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message });
     }
@@ -17,7 +23,7 @@ const addPrice = async (req, res, next) => {
 
 const getPrice = async (req, res, next) => {
   try {
-    const resp = await PriceServices.getPrice();
+    const resp = await PriceServices.getPrice(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message ,data:resp.data});
     }

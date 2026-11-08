@@ -1,8 +1,14 @@
 const employeeService = require('../services/employeeService');
 
+const getRequestData = (req) => ({
+  ...req.body,
+  ...req.query,
+  ...req.params
+});
+
 const createEmployee = async (req, res, next) => {
   try {
-    const resp = await employeeService.createEmployee(req.body);
+    const resp = await employeeService.createEmployee(getRequestData(req));
     if (resp.success) {
       res.send({ success: true, message: resp.message,data: resp.data });
     } else {
@@ -15,7 +21,8 @@ const createEmployee = async (req, res, next) => {
 
 const updateEmployee = async (req, res, next) => {
   try {
-    const resp = await employeeService.updateEmployee(req.body);
+    const requestData = getRequestData(req);
+    const resp = await employeeService.updateEmployee(requestData.id, requestData);
     if (resp.success) {
       res.send({ success: true, message: resp.message });
     } else {
@@ -28,7 +35,7 @@ const updateEmployee = async (req, res, next) => {
 
 const getEmployee = async (req, res, next) => {
   try {
-    const resp = await employeeService.getEmployee(req.body);
+    const resp = await employeeService.getEmployee(getRequestData(req).id);
     if (resp.success) {
       res.send({ success: true, message: resp.message, data: resp.data });
     } else {
@@ -41,7 +48,7 @@ const getEmployee = async (req, res, next) => {
 
 const getEmployeeNameList = async (req, res, next) => {
   try {
-    const resp = await employeeService.getEmployeeNameList();
+    const resp = await employeeService.getEmployeeNameList(getRequestData(req));
     if (resp.success) {
       res.send({ success: true, message: resp.message, data: resp.data });
     } else {
@@ -54,7 +61,7 @@ const getEmployeeNameList = async (req, res, next) => {
 
 const getEmployeeId = async (req, res, next) => {
   try {
-    const resp = await employeeService.getEmployeeId(req.body);
+    const resp = await employeeService.getEmployeeId(getRequestData(req));
     if (resp.success) {
       res.send({ success: true, message: resp.message, data: resp.data });
     } else {

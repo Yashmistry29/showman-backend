@@ -2,7 +2,14 @@ const router = require("express").Router();
 
 const { addPrice, getPrice } = require('../controllers/priceController');
 
-router.post("/editprice", addPrice);
-router.post("/getprice", getPrice);
+// Legacy route: POST /price/editprice
+// router.post("/editprice", addPrice);
+// Suggested new route: POST /price
+router.post("/", addPrice);
+
+// Legacy route: POST /price/getprice
+// router.post("/getprice", getPrice);
+// Suggested new route: GET /price
+router.get("/", getPrice);
 
 module.exports = router;

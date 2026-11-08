@@ -1,8 +1,14 @@
 const userServices = require('../services/userServices');
 
+const getRequestData = (req) => ({
+  ...req.body,
+  ...req.query,
+  ...req.params
+});
+
 const login = async (req, res, next) => {
   try { 
-    const resp = await userServices.Login(req.body);
+    const resp = await userServices.Login(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message});
     }
@@ -16,7 +22,7 @@ const login = async (req, res, next) => {
 
 const signup = async (req, res, next) => { 
   try {
-    const resp = await userServices.Signup(req.body);
+    const resp = await userServices.Signup(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message});
     }
@@ -31,7 +37,7 @@ const signup = async (req, res, next) => {
 
 const forgetPassword = async (req, res, next) => { 
   try { 
-    const resp = await userServices.ForgetPassword(req.body);
+    const resp = await userServices.ForgetPassword(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message});
     }
@@ -46,7 +52,7 @@ const forgetPassword = async (req, res, next) => {
 
 const signout = async (req, res, next) => {
   try {
-    const resp = await userServices.Signout();
+    const resp = await userServices.Signout(getRequestData(req));
     if (resp.success == true) {
       res.send({ success: true, message: resp.message });
     }

@@ -1,26 +1,26 @@
-const mongoose = require("mongoose");
-const md5 = require('md5');
+const bcrypt = require('bcryptjs');
 const user = require('../models/userModel');
 
-const db = mongoose.connection;
-
+const BCRYPT_ROUNDS = 12;
 
 exports.Login = async (body) => {
     try {
-      var query = { username: body.username };
-      console.log(body)
-      let resp = await user.findOne(query);
-      console.log(resp);
+      if (!body || typeof body.username !== 'string' || typeof body.password !== 'string') {
+        return { success: false, message: 'Username and password are required' };
+      }
+
+      const resp = await user.findOne({ username: body.username });
 
       if (resp != null) {
-        if (md5(body.password) === resp.password) {
-          return { success: true, message: 'Login Successful' };
-        } else {
+        const validPassword = await bcrypt.compare(body.password, resp.password);
+        if (!validPassword) {
           return { success: false, message: 'Invalid Username or password.' };
         }
+
+        return { success: true, message: 'Login Successful' };
       } else {
         return {
-          status: false,
+          success: false,
           message: 'User not found'
         };
       }
@@ -35,18 +35,15 @@ exports.Signup = async (body) => {
       if (body.password !== body.confirmPassword) {
         return { success: false, message: 'Passwords do not match' };
       } else {
-        // console.log(body.username, body.email, body.password, body.confirmPassword);
         const data = {
           username: body.username,
           email: body.email,
-          password: md5(body.password),
+          password: await bcrypt.hash(body.password, BCRYPT_ROUNDS),
         }
-        let resp = await user.create(data);
-        console.log(resp)
+        await user.create(data);
         return { success: true, message: 'Signup Successful' };
       }
     } catch (err) {
-      console.log(err)
       return { success: false, message: err.message };
     }
   }
