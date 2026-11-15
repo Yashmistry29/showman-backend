@@ -12,12 +12,14 @@ const userSchema = new mongoose.Schema({
 
 const dbModels = mongoose.model('User', userSchema, "Admin");
 
-// dbModels.create([{
-//   "_id": "6410337db891c1dd07e68cdc",
-//   "email": "sharadjmistry@gmail.com",
-//   "password": "3691308f2a4c2f6983f2880d32e29c84",
-//   "username": "sm"
-// }]);
+// dbModels.create([
+//   {
+//     "_id": "6410337db891c1dd07e68cdc",
+//     "email": "sharadjmistry@gmail.com",
+//     "password": "$2b$12$oz5JuF9fFvxmpQ0XhCtpHuckKD5quwCBEI2yCXMdvu3nTpEgCRHyK",
+//     "username": "sm"
+//   }
+// ]); 
 
 module.exports = dbModels
 

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const employeeSchema = new mongoose.Schema({
-  e_id: Number,
+  e_id: { type: Number, required: true, unique: true },
   name: String,
   address: String,
   phone: String,

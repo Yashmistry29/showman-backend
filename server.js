@@ -5,6 +5,9 @@ require("./database/database");
 
 const config = require("./config");
 const app = express();
+const swaggerUi = require("swagger-ui-express");
+const openApiSpec = require("./swagger");
+const requestLogger = require("./middleware/requestLogger");
 
 // CORS
 var cors = require("cors");
@@ -24,6 +27,11 @@ const PORT = config.port || 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(requestLogger);
+
+// Swagger UI setup
+app.get("/api-docs.json", (req, res) => res.json(openApiSpec));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
 
 // Routes
 

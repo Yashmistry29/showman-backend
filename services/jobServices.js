@@ -1,34 +1,59 @@
-const { default: mongoose } = require('mongoose');
 const JobData = require('../models/jobData');
 const Customer = require('../models/customerModel');
+const idCounterService = require('./idCounterService');
 
 exports.createJob = async (body) => {
     try {
-      const c_id = body.c_id;
-      var jobData = body.jobData;
+      const c_id = Number(body.c_id);
+      if (!Number.isSafeInteger(c_id) || c_id < 0 || !body.jobData) {
+        return { success: false, message: 'Valid c_id and jobData are required' };
+      }
+      const customer = await Customer.findOne({ c_id });
+      if (!customer) {
+        return { success: false, message: 'Customer does not exist' };
+      }
 
-      var resp = await JobData.create(jobData);
-      console.log(resp.job_id);
+      const jobData = { ...body.jobData, job_id: await idCounterService.getNextId('job', true) };
+      const result = await JobData.findOneAndUpdate(
+        { job_id: jobData.job_id },
+        { $setOnInsert: jobData },
+        { upsert: true, new: true, rawResult: true, setDefaultsOnInsert: true }
+      );
+      const job = result.value;
+      if (!job) {
+        throw new Error('Job upsert returned no document');
+      }
 
-      const update_Customer = await Customer.updateOne({ c_id: c_id }, {
-        $set: {
-          latest_job_id: resp.job_id,
-          job_ids: [resp.job_id]
-        }
-      })
-      console.log(update_Customer);
-      return { success: true, message: 'Job created successfully' };
+      if (!result.lastErrorObject.updatedExisting) {
+        await Customer.updateOne({ c_id }, {
+          $addToSet: { job_ids: job.job_id },
+          $set: { latest_job_id: job.job_id }
+        });
+      }
+
+      return {
+        success: true,
+        message: result.lastErrorObject.updatedExisting
+          ? 'Job already exists'
+          : 'Job created successfully',
+        data: job
+      };
     }
     catch (err) {
-      console.log(err);
+      if (err.code === 11000) {
+        return { success: false, message: 'Job ID already exists' };
+      }
       return { success: false, message: err.message };
     }
   }
 
-exports.getJob = async (body) => {
+exports.getJob = async (jobId) => {
     try {
-      console.log(body);
-      var data = await JobData.findOne({ job_id: body.job_id });
+      const job_id = Number(jobId);
+      if (!Number.isSafeInteger(job_id) || job_id < 0) {
+        return { success: false, message: 'Invalid job ID' };
+      }
+      const data = await JobData.findOne({ job_id });
       if (data === null) {
         return { success: false, message: 'Job doesnot exist' };
       }
@@ -42,25 +67,24 @@ exports.getJob = async (body) => {
     }
   }
 
-exports.updateJob = async (body) => {
+exports.updateJob = async (customerId, body) => {
     try {
-      const c_id = body.c_id;
-      var jobData = body.jobData;
+      const c_id = Number(customerId);
+      if (!Number.isSafeInteger(c_id) || c_id < 0) {
+        return { success: false, message: 'Invalid customer ID' };
+      }
+      const customerExists = await Customer.exists({ c_id });
+      if (!customerExists) {
+        return { success: false, message: 'Customer does not exist' };
+      }
 
-      var resp = await JobData.create(jobData);
-      console.log(resp.job_id);
-
-      const customer = await Customer.updateOne({ c_id: c_id }, {
-        $push: {
-          job_ids: resp.job_id
-        },
-        $set: {
-          latest_job_id: resp.job_id
-        }
-      })
-      console.log(customer);
-      // console.log(update_Customer);
-      return { success: true, message: 'Job Created and Update successfully' };
+      const jobData = { ...body.jobData, job_id: await idCounterService.getNextId('job', true) };
+      const job = await JobData.create(jobData);
+      await Customer.updateOne({ c_id }, {
+        $addToSet: { job_ids: job.job_id },
+        $set: { latest_job_id: job.job_id }
+      });
+      return { success: true, message: 'Job created and added to customer', data: job };
     }
     catch (err) {
       console.log(err);
@@ -68,18 +92,24 @@ exports.updateJob = async (body) => {
     }
   }
   
-exports.deleteJob = async (body) => {
+exports.deleteJob = async (customerId, jobId) => {
     try {
-      const { job_id, c_id } = body;
-      console.log(job_id, c_id);
-      var resp = await Customer.updateOne({ c_id: c_id }, {
+      const c_id = Number(customerId);
+      const job_id = Number(jobId);
+      if (!Number.isSafeInteger(c_id) || c_id < 0 || !Number.isSafeInteger(job_id) || job_id < 0) {
+        return { success: false, message: 'Invalid customer or job ID' };
+      }
+      const resp = await Customer.updateOne({ c_id, job_ids: job_id }, {
         $pull: {
           job_ids: job_id
-        }, $push: {
+        },
+        $addToSet: {
           deleted_job_ids: job_id
         }
       });
-      console.log(resp)
+      if (resp.matchedCount === 0) {
+        return { success: false, message: 'Job is not associated with this customer' };
+      }
 
       return { success: true, message: 'Job Deleted Successfully' };
     }
@@ -89,11 +119,10 @@ exports.deleteJob = async (body) => {
     }
   }
 
-exports.getAllJobs = async (body) => {
+exports.getAllJobs = async () => {
     try {
-      console.log(body);
-      const data="";
-      return { success: true, message: 'All Jobs Fetched Successfully', data: data };
+      const data = await JobData.find({}).sort({ job_id: 1 });
+      return { success: true, message: 'All Jobs Fetched Successfully', data };
     }
     catch (err) {
       console.log(err);
@@ -101,22 +130,18 @@ exports.getAllJobs = async (body) => {
     }
   }
 
-exports.getAllJobDataByName = async (body) => {
+exports.getAllJobDataByName = async (customerId) => {
     try {
-      // console.log(body);
-      if (body.name != '-') {
-        let data = [];
-        var customerData = await Customer.find({ c_id: body.name });
-        var job_ids = [...customerData[0].job_ids];
-        for (let i = 0; i < job_ids.length; i++) {
-          const resp = await JobData.findOne({ job_id: job_ids[i] });
-          if (resp !== null) {
-            data.push(resp);
-          }
-        }
-
-        return { success: true, message: 'All Jobs Fetched Successfully', customerData: customerData, data: data };
+      const c_id = Number(customerId);
+      if (!Number.isSafeInteger(c_id) || c_id < 0) {
+        return { success: false, message: 'Invalid customer ID' };
       }
+      const customer = await Customer.findOne({ c_id });
+      if (!customer) {
+        return { success: false, message: 'Customer does not exist' };
+      }
+      const data = await JobData.find({ job_id: { $in: customer.job_ids || [] } }).sort({ job_id: 1 });
+      return { success: true, message: 'All Jobs Fetched Successfully', customerData: [customer], data };
     }
     catch (err) {
       console.log(err);
@@ -124,26 +149,18 @@ exports.getAllJobDataByName = async (body) => {
     }
   }
 
-exports.getAllJobDataByMobile = async (body) => {
+exports.getAllJobDataByMobile = async (mobile) => {
     try {
-      console.log(body);
-      if (body.mobile != '' || body.mobile != undefined) {
-        let data = [];
-        var customerData = await Customer.find({ phone: body.mobile });
-        if (customerData.length == 0) {
-          return { success: false, message: 'No Records Found' };
-        }
-        else {
-          var job_ids = [...customerData[0].job_ids];
-          for (let i = 0; i < job_ids.length; i++) {
-            const resp = await JobData.findOne({ job_id: job_ids[i] });
-            if (resp !== null) {
-              data.push(resp);
-            }
-          }
-          return { success: true, message: 'All Jobs Fetched Successfully', customerData: customerData, data: data };
-        }
+      if (!mobile) {
+        return { success: false, message: 'Mobile number is required' };
       }
+      const customerData = await Customer.find({ phone: String(mobile) });
+      if (customerData.length === 0) {
+        return { success: false, message: 'No Records Found' };
+      }
+      const jobIds = customerData.flatMap(customer => customer.job_ids || []);
+      const data = await JobData.find({ job_id: { $in: jobIds } }).sort({ job_id: 1 });
+      return { success: true, message: 'All Jobs Fetched Successfully', customerData, data };
     }
     catch (err) {
       console.log(err);
@@ -153,24 +170,23 @@ exports.getAllJobDataByMobile = async (body) => {
 
 exports.getJobsBetweenDates = async (body) => {
     try {
-      const startDate = new Date(body.startDate).toISOString();
-      const endDate = new Date(body.endDate).toISOString();
-      var customerData = [];
-
-      var data = await JobData.find({ $and: [{ returnDate: { $gt: startDate } }, { returnDate: { $lt: endDate } }] }).sort({ job_id: 1 })
+      const start = new Date(body.startDate);
+      const end = new Date(body.endDate);
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || start > end) {
+        return { success: false, message: 'Valid startDate and endDate are required' };
+      }
+      const startDate = start.toISOString();
+      const endDate = end.toISOString();
+      const data = await JobData.find({
+        returnDate: { $gt: startDate, $lt: endDate }
+      }).sort({ job_id: 1 });
 
       if (data.length == 0) {
         return { success: false, message: 'No Records Found' };
       }
-      else {
-        for (let i = 0; i < data.length; i++) {
-          const resp = await Customer.findOne({ job_ids: data[i].job_id });
-          if (resp !== null) {
-            customerData.push(resp);
-          }
-        }
-        return { success: true, message: 'All Jobs Fetched Successfully', data: data, customerData: customerData };
-      }
+      const jobIds = data.map(job => job.job_id);
+      const customerData = await Customer.find({ job_ids: { $in: jobIds } });
+      return { success: true, message: 'All Jobs Fetched Successfully', data, customerData };
     }
     catch (err) {
       console.log(err);
@@ -180,8 +196,7 @@ exports.getJobsBetweenDates = async (body) => {
 
 exports.getJobID = async () => {
     try {
-      var resp = await JobData.findOne().sort({ job_id: -1 }).limit(1);
-      const job_id = resp.job_id + 1;
+      const job_id = await idCounterService.getNextId('job');
       return {
         success: true,
         message: job_id
@@ -192,9 +207,16 @@ exports.getJobID = async () => {
     }
   }
 
-exports.getCurrentJobPrice = async (body) => {
+exports.getCurrentJobPrice = async (jobId) => {
     try {
-      var resp = await JobData.findOne({ job_id: body.job_id });
+      const job_id = Number(jobId);
+      if (!Number.isSafeInteger(job_id) || job_id < 0) {
+        return { success: false, message: 'Invalid job ID' };
+      }
+      const resp = await JobData.findOne({ job_id });
+      if (!resp) {
+        return { success: false, message: 'Job does not exist' };
+      }
       var data = {
         totalPrice: resp.totalPrice,
         shirt_price: resp.shirt_data.price,

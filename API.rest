@@ -1,0 +1,235 @@
+@baseUrl = http://localhost:4000
+
+### Health check
+GET {{baseUrl}}/
+
+### OpenAPI specification
+GET {{baseUrl}}/api-docs.json
+
+### Create a user account
+POST {{baseUrl}}/user/accounts
+Content-Type: application/json
+
+{
+  "username": "sample-user",
+  "email": "sample@example.com",
+  "password": "change-this-password",
+  "confirmPassword": "change-this-password"
+}
+
+### Log in
+POST {{baseUrl}}/user/sessions
+Content-Type: application/json
+
+{
+  "username": "sample-user",
+  "password": "change-this-password"
+}
+
+### Sign out
+DELETE {{baseUrl}}/user/sessions
+
+### Request a password reset
+POST {{baseUrl}}/user/password-resets
+Content-Type: application/json
+
+{
+  "username": "sample-user",
+  "email": "sample@example.com"
+}
+
+### Get a preview of the next customer ID
+GET {{baseUrl}}/customer/id
+
+### Create a customer
+POST {{baseUrl}}/customer
+Content-Type: application/json
+
+{
+  "name": "Sample Customer",
+  "phone": "5550101000",
+  "phone2": "",
+  "address": "123 Sample Street"
+}
+
+### Get all customers
+GET {{baseUrl}}/customer
+
+### Get the customer name list
+GET {{baseUrl}}/customer/names
+
+### Get a customer by ID
+GET {{baseUrl}}/customer/1001
+
+### Get customer details by ID
+GET {{baseUrl}}/customer/1001/details
+
+### Update a customer
+PUT {{baseUrl}}/customer/1001
+Content-Type: application/json
+
+{
+  "name": "Updated Sample Customer",
+  "phone": "5550101001",
+  "phone2": "",
+  "address": "456 Example Avenue"
+}
+
+### Delete a customer
+DELETE {{baseUrl}}/customer/1001
+
+### Get a preview of the next employee ID
+GET {{baseUrl}}/employee/id
+
+### Create an employee
+POST {{baseUrl}}/employee
+Content-Type: application/json
+
+{
+  "name": "Sample Tailor",
+  "address": "12 Workshop Road",
+  "phone": "5550102000",
+  "type": ["shirt", "pant"],
+  "wages_type": "quantity"
+}
+
+### Get employee names
+GET {{baseUrl}}/employee/names
+
+### Get an employee by ID
+GET {{baseUrl}}/employee/2001
+
+### Update an employee
+PUT {{baseUrl}}/employee/2001
+Content-Type: application/json
+
+{
+  "name": "Updated Sample Tailor",
+  "address": "14 Workshop Road",
+  "phone": "5550102001",
+  "type": ["shirt"],
+  "wages_type": "daily"
+}
+
+### Get a preview of the next job ID
+GET {{baseUrl}}/job/id
+
+### Create a job for an existing customer
+POST {{baseUrl}}/job
+Content-Type: application/json
+
+{
+  "c_id": 1001,
+  "jobData": {
+    "shirt_quantity": 1,
+    "pant_quantity": 1,
+    "createdAt": "2026-11-15T00:00:00.000Z",
+    "returnDate": "2026-12-01T00:00:00.000Z",
+    "totalPrice": 830,
+    "shirt_data": {
+      "s_length": "29",
+      "shoulder": "18",
+      "sleeve": "24.5",
+      "cuff": "8",
+      "chest": "43",
+      "waist": "45",
+      "seat": "44",
+      "pocket": "2",
+      "collar": "17.5",
+      "strip": "in",
+      "shirt_type": "Open Shirt",
+      "description": "",
+      "price": 350
+    },
+    "pant_data": {
+      "p_length": "35",
+      "waist": "42.5",
+      "jholo": "11",
+      "seat": "44",
+      "thighs": "27",
+      "knee": "24",
+      "bottom": "20",
+      "back_pocket": "2",
+      "chipti": "2",
+      "pocket_type": "side",
+      "belt_type": "1.5",
+      "description": "Elastic",
+      "price": 480
+    }
+  }
+}
+
+### Get all jobs
+GET {{baseUrl}}/job
+
+### Get a job by ID
+GET {{baseUrl}}/job/3001
+
+### Get the current price recorded on a job
+GET {{baseUrl}}/job/3001/price
+
+### Get jobs belonging to a customer
+GET {{baseUrl}}/job/customer/1001/jobs
+
+### Add another job to a customer
+POST {{baseUrl}}/job/customer/1001/jobs
+Content-Type: application/json
+
+{
+  "jobData": {
+    "shirt_quantity": 1,
+    "pant_quantity": 0,
+    "createdAt": "2026-11-15T00:00:00.000Z",
+    "returnDate": "2026-12-10T00:00:00.000Z",
+    "totalPrice": 350,
+    "shirt_data": {
+      "s_length": "29",
+      "shoulder": "18",
+      "sleeve": "24.5",
+      "cuff": "8",
+      "chest": "43",
+      "waist": "45",
+      "seat": "44",
+      "pocket": "2",
+      "collar": "17.5",
+      "strip": "in",
+      "shirt_type": "Open Shirt",
+      "description": "",
+      "price": 350
+    }
+  }
+}
+
+### Delete a job from a customer
+DELETE {{baseUrl}}/job/customer/1001/jobs/3001
+
+### Find jobs by customer phone number
+GET {{baseUrl}}/job/mobile/5550101000
+
+### Find jobs with return dates in a range
+GET {{baseUrl}}/job/dates?startDate=2026-11-01T00%3A00%3A00.000Z&endDate=2026-12-31T23%3A59%3A59.999Z
+
+### Add a price record
+POST {{baseUrl}}/price
+Content-Type: application/json
+
+{
+  "shirt_price": 400,
+  "pant_price": 500
+}
+
+### Get the latest prices
+GET {{baseUrl}}/price
+
+### Back up database collections
+POST {{baseUrl}}/db/backup
+
+### Restore database collections
+# WARNING: This permanently replaces the Price, JobData, Customer, and Admin collections.
+# The ZIP file must exist on the server and contain data.json.
+POST {{baseUrl}}/db/restore
+Content-Type: application/json
+
+{
+  "path": "C:\\path\\to\\backup.zip"
+}
